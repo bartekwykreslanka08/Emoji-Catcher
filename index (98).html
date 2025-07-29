@@ -1,0 +1,262 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Catcher</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-stats" id="gameStats" style="display: none;">
+        <span class="stat-item" id="score">0</span>
+        <span class="stat-item" id="time">30</span>
+        <button id="stopButton" onclick="stopGame()">Stop</button>
+    </div>
+
+    <div class="container" id="loginSection">
+        <h1>Emoji Catcher</h1>
+        <label for="username">Nazwa użytkownika:</label>
+        <input type="text" id="username" class="login-input" placeholder="Wpisz nazwę...">
+        <label for="password">Hasło:</label>
+        <div style="position: relative; display: inline-block; width: 85%; max-width: 340px;">
+            <input type="password" id="password" class="login-input" placeholder="Wpisz hasło...">
+            <span class="password-toggle" onclick="togglePasswordVisibility()">🔍</span>
+        </div>
+        <label><input type="checkbox" id="saveCredentials"> Zapisz dane</label>
+        <button onclick="login()">Zaloguj</button>
+        <button onclick="register()">Zarejestruj</button>
+    </div>
+
+    <div class="container" id="mainSection" style="display: none;">
+        <h1>Emoji Catcher</h1>
+        <div class="player-info" id="playerInfo"></div>
+        <button id="startGameBtn" class="nav-button" onclick="startGame()">Start Game</button>
+        <button id="topScoresBtn" class="nav-button" onclick="showTab('topScores')">Top Scores</button>
+        <button id="modesBtn" class="nav-button" onclick="showTab('modes')">Tryby</button>
+        <button id="indexBtn" class="nav-button" onclick="showTab('index')">Indeks</button>
+        <button class="gear-button" onclick="logout()">🚪</button>
+    </div>
+
+    <div id="gameArea" style="display: none;"></div>
+
+    <div id="topScoresSection" class="tab-content" style="display: none;">
+        <h2>Twoje Najlepsze Wyniki</h2>
+        <div id="topScoresContent">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="showSubTab('topScores', 'easy')">Łatwy</button>
+                <button class="tab-button" onclick="showSubTab('topScores', 'medium')">Średni</button>
+                <button class="tab-button" onclick="showSubTab('topScores', 'hard')">Trudny</button>
+            </div>
+            <div id="easyTopScores" class="sub-tab" style="display: block;">
+                <table class="index-table">
+                    <tr><th>Miejsce</th><th>Punkty</th><th>Data</th></tr>
+                </table>
+            </div>
+            <div id="mediumTopScores" class="sub-tab" style="display: none;">
+                <table class="index-table">
+                    <tr><th>Miejsce</th><th>Punkty</th><th>Data</th></tr>
+                </table>
+            </div>
+            <div id="hardTopScores" class="sub-tab" style="display: none;">
+                <table class="index-table">
+                    <tr><th>Miejsce</th><th>Punkty</th><th>Data</th></tr>
+                </table>
+            </div>
+            <button onclick="hideTab('topScores')">Zamknij</button>
+        </div>
+    </div>
+
+    <div id="modesTab" class="tab-content" style="display: none;">
+        <h2>Wybierz Tryb i Modyfikator</h2>
+        <div id="modesContent">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="showSubTab('modes', 'mode')">Tryby</button>
+                <button class="tab-button" onclick="showSubTab('modes', 'theme')">Tematy</button>
+                <button class="tab-button" onclick="showSubTab('modes', 'modifier')">Modyfikatory</button>
+            </div>
+            <div id="modeSubTab" class="sub-tab" style="display: block;">
+                <table class="index-table">
+                    <tr><th>Tryb</th><th>Czas</th><th>Poziom</th></tr>
+                    <tr><td>Łatwy</td><td>50s</td><td>Prosty</td></tr>
+                    <tr><td>Średni</td><td>30s</td><td>Normalny</td></tr>
+                    <tr><td>Trudny</td><td>15s</td><td>Zaawansowany</td></tr>
+                </table>
+                <button onclick="setMode('easy')">Łatwy</button>
+                <button onclick="setMode('medium')">Średni</button>
+                <button onclick="setMode('hard')">Trudny</button>
+            </div>
+            <div id="themeSubTab" class="sub-tab" style="display: none;">
+                <table class="index-table">
+                    <tr><th>Temat</th><th>Opis</th><th>Akcja</th></tr>
+                    <tr><td>Domyślny</td><td>Różne emoji</td><td><button onclick="setTheme('default')">Wybierz</button></td></tr>
+                    <tr><td>Retro</td><td>指標
+
+                    Stworzona przez użytkownika tabela w zakładce "Tryby" w pliku index.html jest poprawna i zawiera poprawne dane dla trybów: łatwy, średni i trudny. Nie wymaga zmian, ale upewniłem się, że jest spójna z logiką w script.js.
+
+                    <tr><td>Retro</td><td>Styl retro</td><td><button onclick="setTheme('retro')">Wybierz</button></td></tr>
+                    <tr><td>Ocean</td><td>Motyw oceanu</td><td><button onclick="setTheme('ocean')">Wybierz</button></td></tr>
+                    <tr><td>Zima</td><td>Motyw zimowy</td><td><button onclick="setTheme('winter')">Wybierz</button></td></tr>
+                    <tr><td>Lato</td><td>Motyw letni</td><td><button onclick="setTheme('summer')">Wybierz</button></td></tr>
+                    <tr><td>Kolory</td><td>Motyw kolorów</td><td><button onclick="setTheme('color')">Wybierz</button></td></tr>
+                    <tr><td>Wieczór</td><td>Motyw wieczoru</td><td><button onclick="setTheme('evening')">Wybierz</button></td></tr>
+                    <tr><td>Halloween</td><td>Motyw halloween</td><td><button onclick="setTheme('halloween')">Wybierz</button></td></tr>
+                    <tr><td>Neon</td><td>Motyw neonowy</td><td><button onclick="setTheme('neon')">Wybierz</button></td></tr>
+                    <tr><td>Czas</td><td>Motyw czasu</td><td><button onclick="setTheme('time')">Wybierz</button></td></tr>
+                </table>
+            </div>
+            <div id="modifierSubTab" class="sub-tab" style="display: none;">
+                <table class="index-table">
+                    <tr><th>Modyfikator</th><th>Opis</th><th>Akcja</th></tr>
+                    <tr><td>1 Minuta</td><td>60 sekund gry</td><td><button onclick="setModifier('oneMinute')">Wybierz</button></td></tr>
+                    <tr><td>Większy Kosz</td><td>Większy kosz</td><td><button onclick="setModifier('biggerBasket')">Wybierz</button></td></tr>
+                    <tr><td>Duet</td><td>Dwa kosze</td><td><button onclick="setModifier('duet')">Wybierz</button></td></tr>
+                    <tr><td>Mini Kosz</td><td>Mniejszy kosz</td><td><button onclick="setModifier('miniBasket')">Wybierz</button></td></tr>
+                </table>
+            </div>
+            <button onclick="hideTab('modes')">Zamknij</button>
+        </div>
+    </div>
+
+    <div id="indexTab" class="tab-content" style="display: none;">
+        <h2>Indeks Emoji</h2>
+        <div id="indexContent">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="showSubTab('index', 'default')">Domyślny</button>
+                <button class="tab-button" onclick="showSubTab('index', 'retro')">Retro</button>
+                <button class="tab-button" onclick="showSubTab('index', 'ocean')">Ocean</button>
+                <button class="tab-button" onclick="showSubTab('index', 'winter')">Zima</button>
+                <button class="tab-button" onclick="showSubTab('index', 'summer')">Lato</button>
+                <button class="tab-button" onclick="showSubTab('index', 'color')">Kolory</button>
+                <button class="tab-button" onclick="showSubTab('index', 'evening')">Wieczór</button>
+                <button class="tab-button" onclick="showSubTab('index', 'halloween')">Halloween</button>
+                <button class="tab-button" onclick="showSubTab('index', 'neon')">Neon</button>
+                <button class="tab-button" onclick="showSubTab('index', 'time')">Czas</button>
+            </div>
+            <div id="defaultSubTab" class="sub-tab" style="display: block;">
+                <table class="index-table">
+                    <tr><th>Emoji</th><th>Wartość</th><th>Czas</th></tr>
+                    <tr><td>😊</td><td>+5 do +7</td><td>+5s do +8s</td></tr>
+                    <tr><td>💣</td><td>-6</td><td>-7s</td></tr>
+                    <tr><td>🧲</td><td>+10</td><td>0s (5s magnes)</td></tr>
+                    <!-- Poprawione wartości zgodnie z logiką gry -->
+                </table>
+            </div>
+            <div id="retroSubTab" class="sub-tab" style="display: none;">
+                <table class="index-table">
+                    <tr><th>Emoji</th><th>Wartość</th><th>Czas</th></tr>
+                    <tr><td>🎱</td><td>+5 do +7</td><td>+5s do +8s</td></tr>
+                    <tr><td>💣</td><td>-6</td><td>-7s</td></tr>
+                    <tr><td>🧲</td><td>+10</td><td>0s (5s magnes)</td></tr>
+                </table>
+            </div>
+            <div id="oceanSubTab" class="sub-tab" style="display: none;">
+                <table class="index-table">
+                    <tr><th>Emoji</th><th>Wartość</th><th>Czas</th></tr>
+                    <tr><td>🐠</td><td>+5 do +7</td><td>+5s do +8s</td></tr>
+                    <tr><td>💣</td><td>-6</td><td>-7s</td></tr>
+                    <tr><td>🧲</td><td>+10</td><td>0s (5s magnes)</td></tr>
+                </table>
+            </div>
+            <div id="winterSubTab" class="sub-tab" style="display: none;">
+                <table class="index-table">
+                    <tr><th>Emoji</th><th>Wartość</th><th>Czas</th></tr>
+                    <tr><td>❄️</td><td>+5 do +7</td><td>+5s do +8s</td></tr>
+                    <tr><td>💣</td><td>-6</td><td>-7s</td></tr>
+                    <tr><td>🧲</td><td>+10</td><td>0s (5s magnes)</td></tr>
+                </table>
+            </div>
+            <div id="summerSubTab" class="sub-tab" style="display: none;">
+                <table class="index-table">
+                    <tr><th>Emoji</th><th>Wartość</th><th>Czas</th></tr>
+                    <tr><td>☀️</td><td>+5 do +7</td><td>+5s do +8s</td></tr>
+                    <tr><td>💣</td><td>-6</td><td>-7s</td></tr>
+                    <tr><td>🧲</td><td>+10</td><td>0s (5s magnes)</td></tr>
+                </table>
+            </div>
+            <div id="colorSubTab" class="sub-tab" style="display: none;">
+                <table class="index-table">
+                    <tr><th>Emoji</th><th>Wartość</th><th>Czas</th></tr>
+                    <tr><td>❤️</td><td>+5 do +7</td><td>+5s do +8s</td></tr>
+                    <tr><td>💣</td><td>-6</td><td>-7s</td></tr>
+                    <tr><td>🧲</td><td>+10</td><td>0s (5s magnes)</td></tr>
+                </table>
+            </div>
+            <div id="eveningSubTab" class="sub-tab" style="display: none;">
+                <table class="index-table">
+                    <tr><th>Emoji</th><th>Wartość</th><th>Czas</th></tr>
+                    <tr><td>🌙</td><td>+5 do +7</td><td>+5s do +8s</td></tr>
+                    <tr><td>💣</td><td>-6</td><td>-7s</td></tr>
+                    <tr><td>🧲</td><td>+10</td><td>0s (5s magnes)</td></tr>
+                </table>
+            </div>
+            <div id="halloweenSubTab" class="sub-tab" style="display: none;">
+                <table class="index-table">
+                    <tr><th>Emoji</th><th>Wartość</th><th>Czas</th></tr>
+                    <tr><td>👻</td><td>+5 do +7</td><td>+5s do +8s</td></tr>
+                    <tr><td>💣</td><td>-6</td><td>-7s</td></tr>
+                    <tr><td>🧲</td><td>+10</td><td>0s (5s magnes)</td></tr>
+                </table>
+            </div>
+            <div id="neonSubTab" class="sub-tab" style="display: none;">
+                <table class="index-table">
+                    <tr><th>Emoji</th><th>Wartość</th><th>Czas</th></tr>
+                    <tr><td>💡</td><td>+5 do +7</td><td>+5s do +8s</td></tr>
+                    <tr><td>💣</td><td>-6</td><td>-7s</td></tr>
+                    <tr><td>🧲</td><td>+10</td><td>0s (5s magnes)</td></tr>
+                </table>
+            </div>
+            <div id="timeSubTab" class="sub-tab" style="display: none;">
+                <table class="index-table">
+                    <tr><th>Emoji</th><th>Wartość</th><th>Czas</th></tr>
+                    <tr><td>⏰</td><td>+5 do +7</td><td>+5s do +8s</td></tr>
+                    <tr><td>💣</td><td>-6</td><td>-7s</td></tr>
+                    <tr><td>🧲</td><td>+10</td><td>0s (5s magnes)</td></tr>
+                </table>
+            </div>
+            <button onclick="hideTab('index')">Zamknij</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
