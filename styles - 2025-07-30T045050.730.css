@@ -1,0 +1,173 @@
+body {
+    font-family: 'Fredoka One', cursive;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#loginSection, #mainSection {
+    display: none;
+    width: 90vw;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#loginSection input, #loginSection button {
+    display: block;
+    width: 80%;
+    margin: 10px auto;
+    padding: 10px;
+    font-size: 16px;
+}
+
+#playerInfo {
+    display: none;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: white;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+#gameArea {
+    position: relative;
+    width: 90vw;
+    height: 90vh;
+    background: #87CEEB;
+    display: none;
+    overflow: hidden;
+    border: 2px solid #000;
+}
+
+.player {
+    position: absolute;
+    bottom: 2vh;
+    width: 12vw;
+    height: 6vh;
+    background: none;
+    text-align: center;
+    font-size: 5vh;
+    user-select: none;
+}
+
+.bigger-player {
+    width: 18vw;
+}
+
+.mini-player {
+    width: 6vw;
+}
+
+.second-player {
+    position: absolute;
+    bottom: 2vh;
+    width: 12vw;
+    height: 6vh;
+    background: none;
+    text-align: center;
+    font-size: 5vh;
+    user-select: none;
+}
+
+.emoji {
+    position: absolute;
+    font-size: 6vh;
+    user-select: none;
+    opacity: 1;
+}
+
+.modes-tab-button {
+    display: inline-block;
+    margin: 5px;
+    padding: 10px;
+    background: #ddd;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.modes-tab-button.active {
+    background: #4CAF50;
+    color: white;
+}
+
+#modesTab, #indexTab {
+    display: none;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.index-tab {
+    display: none;
+}
+
+.index-tab-button {
+    display: block;
+    margin: 5px 0;
+    padding: 10px;
+    background: #ddd;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.index-tab-button.active {
+    background: #4CAF50;
+    color: white;
+}
+
+#gameStats {
+    display: none;
+    position: absolute;
+    top: 10px;
+    width: 90vw;
+    justify-content: space-around;
+    color: white;
+    font-size: 20px;
+}
+
+#stopButton {
+    display: none;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.default-mode { background: linear-gradient(to bottom, #87CEEB, #E0F6FF); }
+.retro-mode { background: linear-gradient(to bottom, #6A5ACD, #D8BFD8); }
+.ocean-mode { background: linear-gradient(to bottom, #00CED1, #E0FFFF); }
+.winter-mode { background: linear-gradient(to bottom, #ADD8E6, #F0FFF0); }
+.summer-mode { background: linear-gradient(to bottom, #FFD700, #FFA500); }
+.color-mode { background: linear-gradient(to bottom, #FF69B4, #87CEEB); }
+.evening-mode { background: linear-gradient(to bottom, #1E90FF, #000080); }
+.halloween-mode { background: linear-gradient(to bottom, #8B4513, #FF4500); }
+.neon-mode { background: linear-gradient(to bottom, #FF00FF, #00FFFF); }
+.time-mode { background: linear-gradient(to bottom, #DAA520, #F0E68C); }
+.food-mode { background: linear-gradient(to bottom, #FF6347, #FFDAB9); } /* Nowe tło dla jedzenie */
+.animals-mode { background: linear-gradient(to bottom, #90EE90, #98FB98); } /* Nowe tło dla zwierząt */
+.vehicles-mode { background: linear-gradient(to bottom, #4682B4, #B0C4DE); } /* Nowe tło dla pojazdów */
