@@ -1,0 +1,189 @@
+body {
+    font-family: "Fredoka One", sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.5s ease;
+}
+
+#loginSection, #mainSection {
+    display: none;
+    width: 90vw;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#loginSection input, #loginSection button {
+    width: 80%;
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 16px;
+}
+
+#loginSection button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#loginSection button:hover {
+    background-color: #45a049;
+}
+
+#playerInfo {
+    display: none;
+    color: #333;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+#gameArea {
+    position: relative; /* Upewnienie się, że elementy są poprawnie pozycjonowane */
+    width: 90vw;
+    height: 80vh; /* Stała wysokość dla widoczności */
+    background: rgba(255, 255, 255, 0.7); /* Lekkie tło dla widoczności */
+    overflow: hidden;
+    display: none;
+    border: 2px solid #000;
+    border-radius: 5px;
+}
+
+.player {
+    position: absolute;
+    bottom: 2vh;
+    width: 12vw;
+    height: 5vh;
+    background: none;
+    text-align: center;
+    font-size: 4vh;
+    user-select: none;
+    transition: transform 0.1s linear;
+}
+
+.bigger-player {
+    width: 18vw;
+    height: 7vh;
+    font-size: 5vh;
+}
+
+.mini-player {
+    width: 6vw;
+    height: 3vh;
+    font-size: 2vh;
+}
+
+.second-player {
+    position: absolute;
+    bottom: 2vh;
+    width: 12vw;
+    height: 5vh;
+    background: none;
+    text-align: center;
+    font-size: 4vh;
+    user-select: none;
+    transition: transform 0.1s linear;
+}
+
+.emoji {
+    position: absolute;
+    font-size: 4vh;
+    user-select: none;
+    opacity: 1;
+    transition: none;
+}
+
+.active {
+    transition: top 2s linear, opacity 0.3s ease;
+}
+
+#gameStats {
+    display: none;
+    justify-content: space-between;
+    width: 90vw;
+    max-width: 400px;
+    margin-top: 10px;
+    font-size: 18px;
+    color: #333;
+}
+
+#stopButton {
+    display: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#stopButton:hover {
+    background-color: #da190b;
+}
+
+.modes-tab, .index-tab {
+    display: none;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 90vw;
+    max-width: 400px;
+    margin-top: 10px;
+}
+
+.modes-tab-button, .index-tab-button {
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.modes-tab-button:hover, .index-tab-button:hover {
+    background-color: #45a049;
+}
+
+.modes-tab-button.active, .index-tab-button.active {
+    background-color: #2E7D32;
+}
+
+#modesBtn, #indexBtn {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px;
+}
+
+#modesBtn:hover, #indexBtn:hover {
+    background-color: #1976D2;
+}
+
+.default-mode { }
+.retro-mode { }
+.ocean-mode { }
+.winter-mode { }
+.summer-mode { }
+.color-mode { }
+.evening-mode { }
+.halloween-mode { }
+.neon-mode { }
+.time-mode { }
+.food-mode { }
+.animals-mode { }
+.vehicles-mode { }
