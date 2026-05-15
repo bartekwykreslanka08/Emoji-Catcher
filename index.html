@@ -87,6 +87,11 @@
     <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#000000">
 </head>
+    <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
+    </script>
 <body>
 
 <div id="main-menu">
